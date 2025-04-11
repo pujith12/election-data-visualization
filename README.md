@@ -13,7 +13,7 @@ This project leverages real-world electoral data to:
 
 ## 📂 Dataset
 
-- Format: `.csv`
+- Format: `election_data.csv`
 - Columns: `Category`, `Men`, `Women`, `Third Gender`, `Total`
 
 ---
