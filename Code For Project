@@ -1,0 +1,161 @@
+#Code of the Project
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import warnings as wr
+
+# Setup
+wr.filterwarnings('ignore')
+sns.set_style("whitegrid")
+
+# Load data
+df = pd.read_csv("election_data.csv")
+df['Category'] = df['Category'].astype(str).str.strip()  # Clean category names
+
+# Display first few rows and data info
+print(df.head())
+print(df.info())
+print(f"Dataset Shape: {df.shape}")
+
+# Check for missing and duplicated values
+print("Missing values per column:\n", df.isnull().sum())
+print("Count of duplicated values:\n", df.duplicated().sum())
+
+# Fill missing values with 0 in relevant columns
+df.fillna({'Men': 0, 'Women': 0, 'Third Gender': 0, 'Total': 0}, inplace=True)
+
+# Summary statistics
+print("\nDescriptive Statistics:\n", round(df.describe(include='all'), 1))
+
+# Unique values per column
+print("\nUnique values in each column:\n", df.nunique())
+
+# Top 5 rows with highest 'Total'
+top_total = df.nlargest(5, 'Total')
+print("\nTop 5 Categories by Total:\n", top_total)
+
+# Rows with Total > 1,000,000
+high_total = df[df['Total'] > 1000000]
+print("\nRows with Total > 1,000,000:\n", high_total)
+
+# Rows where Men > Women
+more_men = df[df['Men'] > df['Women']]
+print("\nRows where Men > Women:\n", more_men)
+
+# Rows where Men > Women and Total > 100,000
+filtered_rows = df[(df['Men'] > df['Women']) & (df['Total'] > 100000)]
+print("\nRows with Men > Women and Total > 100,000:\n", filtered_rows)
+
+# Bar Plot: Total count by Category
+plt.figure(figsize=(12,6))
+sns.barplot(data=df, x='Category', y='Total', estimator=sum, ci=None)
+plt.xticks(rotation=45, ha='right')
+plt.xlabel("Category")
+plt.ylabel("Total Count")
+plt.title('Total Count by Category')
+plt.tight_layout()
+plt.savefig("barplot_total_by_category.png")  # optional save
+plt.show()
+
+# Pie Chart: Distribution of Categories
+category_counts = df['Category'].value_counts()
+plt.figure(figsize=(8,8))
+plt.pie(category_counts, labels=category_counts.index, autopct='%1.1f%%', startangle=140)
+plt.title('Distribution of Categories')
+plt.axis('equal')
+plt.savefig("category_distribution_piechart.png")  # optional save
+plt.show()
+
+# Electors vs Voters Comparison
+try:
+    voters = df[df['Category'] == 'Voters - General']['Total'].values[0]
+    electors_total = df[df['Category'] == 'Electors - Total']['Total'].values[0]
+
+    plt.bar(['Electors', 'Voters'], [electors_total, voters], color=['skyblue', 'orange'])
+    plt.title("Electors vs Voters")
+    plt.ylabel("Count")
+    plt.savefig("electors_vs_voters.png")  # optional save
+    plt.show()
+
+    turnout_rate = (voters / electors_total) * 100
+    print(f"\nVoter Turnout Rate: {turnout_rate:.2f}%")
+except IndexError:
+    print("\nRequired category for turnout calculation not found.")
+
+# Heatmap: Correlation Matrix
+corr = df[['Men', 'Women', 'Third Gender', 'Total']].corr()
+plt.figure(figsize=(8,6))
+sns.heatmap(corr, annot=True, cmap='YlGnBu')
+plt.title('Correlation Matrix')
+plt.savefig("correlation_heatmap.png")  # optional save
+plt.show()
+
+# Boxplot: Total by Category
+plt.figure(figsize=(12,6))
+sns.boxplot(data=df, x='Category', y='Total')
+plt.xticks(rotation=45, ha='right')
+plt.title('Boxplot of Total by Category')
+plt.ylabel("Total Count")
+plt.xlabel("Category")
+plt.savefig("boxplot_total_by_category.png")  # optional save
+plt.show()
+
+# Histogram: Distribution of Total
+plt.figure(figsize=(10,6))
+sns.histplot(df['Total'], bins=10, kde=True, color='skyblue')
+plt.title("Distribution of Total Count")
+plt.xlabel("Total")
+plt.ylabel("Frequency")
+plt.grid(True)
+plt.savefig("total_distribution_histogram.png")  # optional save
+plt.show()
+# Count Plot: Frequency of each category
+plt.figure(figsize=(12,6))
+sns.countplot(data=df, x='Category', order=df['Category'].value_counts().index)
+plt.xticks(rotation=45, ha='right')
+plt.title('Count of Each Category')
+plt.savefig("countplot_categories.png")
+plt.show()
+
+# Stacked Bar Plot: Men/Women/Third Gender in top 5 categories
+df['Total_Gender'] = df['Men'] + df['Women'] + df['Third Gender']
+top5 = df.groupby('Category')[['Men', 'Women', 'Third Gender']].sum()
+top5['Total_Gender'] = top5[['Men', 'Women', 'Third Gender']].sum(axis=1)
+top5_sorted = top5.nlargest(5, 'Total_Gender')
+
+# Plot
+top5_sorted[['Men', 'Women', 'Third Gender']].plot(
+    kind='bar', stacked=True, figsize=(12,6), colormap='viridis'
+)
+plt.title("Stacked Bar Chart: Gender Distribution (Top 5 Categories)")
+plt.ylabel("Total Count")
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+plt.savefig("stacked_bar_gender.png")
+plt.show()
+
+# Line Plot: Trend of Total (if index can be used as sequence)
+plt.figure(figsize=(10,5))
+df_sorted = df.sort_values(by='Total')
+plt.plot(df_sorted.index, df_sorted['Total'], marker='o')
+plt.title("Trend of Total Count")
+plt.xlabel("Index")
+plt.ylabel("Total")
+plt.grid(True)
+plt.savefig("lineplot_total_trend.png")
+plt.show()
+
+# Pairplot: Relationship between numeric features
+sns.pairplot(df[['Men', 'Women', 'Third Gender', 'Total']])
+plt.suptitle("Pairplot of Gender and Total", y=1.02)
+plt.savefig("pairplot_gender_total.png")
+plt.show()
+
+# Violin Plot: Distribution of Total by Category
+plt.figure(figsize=(12,6))
+sns.violinplot(data=df, x='Category', y='Total')
+plt.xticks(rotation=45, ha='right')
+plt.title('Violin Plot of Total by Category')
+plt.savefig("violinplot_total_by_category.png")
+plt.show()
