@@ -47,3 +47,4 @@ This project leverages real-world electoral data to:
 
 
 
+## Author: Pujith\nGitHub: [pujith12](https://github.com/pujith12)
