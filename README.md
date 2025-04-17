@@ -29,21 +29,6 @@ This project leverages real-world electoral data to:
 
 ---
 
-## 📈 Features
-
-- ✅ Clean and preprocess data (missing values, duplicates)
-- ✅ Gender-wise aggregation and visualizations
-- ✅ Turnout rate computation
-- ✅ Correlation heatmaps and outlier detection
-- ✅ Advanced plots:
-  - Bar charts
-  - Pie charts
-  - Box plots
-  - Violin plots
-  - Histograms
-  - Stacked bar charts
-
----
 
 
 
