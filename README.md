@@ -1,3 +1,4 @@
+# Election Data Visualization Project
 # 🗳️ Election Data Visualization using Python
 
 This project is a comprehensive exploratory data analysis (EDA) and visualization of Indian election data using Python. It extracts insights on voter demographics, turnout ratios, and category distributions across gender.
